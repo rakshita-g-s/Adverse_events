@@ -4,6 +4,9 @@ import joblib
 import pandas as pd
 import numpy as np
 import logging
+import os
+import uvicorn
+
 
 # Configure logging
 logging.basicConfig(level=logging.ERROR)
@@ -78,3 +81,12 @@ def predict(event_data: EventData):
     except Exception as e:
         logging.error("Error during prediction", exc_info=True)
         return {"error": f"Internal Server Error: {str(e)}"}
+
+
+
+app = FastAPI()
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8001))  # Default to 8000 if not set
+    uvicorn.run(app, host="127.0.0.1", port=port)
+
