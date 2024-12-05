@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Load dataset
-data = pd.read_csv(r"C:\Users\raksh\OneDrive\Desktop\Rakshita Sataraddi\adverk\adverse_events.csv")
+data = pd.read_csv("adverse_events.csv")
 
 # Helper to preprocess dates
 def preprocess_dates(data):
