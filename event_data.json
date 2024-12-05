@@ -1,0 +1,20 @@
+{
+    "exemption_number": "123ABC",
+    "manufacturer_registration_number": 12345,
+    "manufacturer_name": "Manufacturer A",
+    "report_id": "RPT001",
+    "date_of_event": "2024-01-15",
+    "manufacturer_aware_date": "2024-01-20",
+    "device_problem_codes": "0001",
+    "report_year": 2024,
+    "report_quarter": 1,
+    "initial_report_flag": "Y",
+    "device_id": "001",
+    "product_code": "PDC001",
+    "brand_name": "BrandX",
+    "model_number": "123",
+    "catalog_number": "CatalogZ",
+    "implant_available_for_evaluation": 1.0,
+    "implant_returned_to_manufacturer": 0.0
+  }
+  
