@@ -8,6 +8,7 @@ import os
 import uvicorn
 
 
+
 # Configure logging
 logging.basicConfig(level=logging.ERROR)
 
@@ -42,6 +43,11 @@ class EventData(BaseModel):
     model_config = {
         'protected_namespaces': ()
     }
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
 
 @app.post("/predict/")
 def predict(event_data: EventData):
@@ -81,6 +87,10 @@ def predict(event_data: EventData):
     except Exception as e:
         logging.error("Error during prediction", exc_info=True)
         return {"error": f"Internal Server Error: {str(e)}"}
+
+
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8001))  # Default to 8000 if not set
