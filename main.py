@@ -1,15 +1,16 @@
-from json import encoder
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel,Field
+from pydantic import BaseModel
 import joblib
 import pandas as pd
-from sklearn.preprocessing import MultiLabelBinarizer, OneHotEncoder
-from typing import List
-import logging
 import numpy as np
+import logging
 
-encoder = pd.read_csv("adverse_events.csv")  # Encoder for categorical data
-model = joblib.load('model.joblib')  # Pre-trained machine learning model
+# Configure logging
+logging.basicConfig(level=logging.ERROR)
+
+# Load pre-trained encoder and model
+encoder = joblib.load('encoder.joblib')  # Make sure this is a fitted encoder
+model = joblib.load('model.joblib')
 
 # Initialize FastAPI
 app = FastAPI()
@@ -34,6 +35,11 @@ class EventData(BaseModel):
     implant_available_for_evaluation: float
     implant_returned_to_manufacturer: float
 
+    # Disable protected namespaces to avoid conflicts
+    model_config = {
+        'protected_namespaces': ()
+    }
+
 @app.post("/predict/")
 def predict(event_data: EventData):
     try:
@@ -43,7 +49,7 @@ def predict(event_data: EventData):
         # Fill missing values (if necessary, based on your dataset's requirements)
         data.fillna(value={"model_number": "Unknown", "catalog_number": "Unknown", "brand_name": "Unknown"}, inplace=True)
 
-        # Encode categorical variables (assumes encoder is already fitted)
+        # Encode categorical variables using the pre-fitted encoder
         categorical_features = [
             "manufacturer_name",
             "device_problem_codes",
@@ -54,33 +60,21 @@ def predict(event_data: EventData):
             "model_number",
             "catalog_number",
         ]
+        
         for col in categorical_features:
-            data[col] = encoder.transform(data[[col]])  # Encode categorical features
+            if col in data.columns:
+                encoded_data = encoder.transform(data[[col]])
+                # Join the encoded columns back to the DataFrame
+                data = data.join(pd.DataFrame(encoded_data, columns=encoder.get_feature_names_out([col])))
+                data.drop(columns=[col], inplace=True)
 
         # Prepare the feature vector
-        feature_vector = np.array(data.values).reshape(1, -1)
+        feature_vector = data.values.reshape(1, -1)
 
         # Predict using the pre-trained model
         prediction = model.predict(feature_vector)
 
         return {"prediction": prediction.tolist()}
     except Exception as e:
+        logging.error("Error during prediction", exc_info=True)
         return {"error": f"Internal Server Error: {str(e)}"}
-    
-
-    
-    # One-hot encode the manufacturers (or other features used in your model)
-   ### manufacturer_data = mlb.transform([event_data.manufacturers])
-    ###input_data.update({label: manufacturer_data[0][i] for i, label in enumerate(mlb.classes_)})
-
-    # Convert input data to a DataFrame
-    ###input_df = pd.DataFrame(input_data)
-
-    # Make predictions using the model
-    ###prediction = model.predict(input_df)
-
-    # Return the prediction result as a JSON response
-    ###return {"predicted_event_type": prediction[0]}
-
-# To run the app, use the command below:
-# uvicorn main:app --reload
