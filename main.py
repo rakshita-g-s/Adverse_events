@@ -82,10 +82,6 @@ def predict(event_data: EventData):
         logging.error("Error during prediction", exc_info=True)
         return {"error": f"Internal Server Error: {str(e)}"}
 
-
-
-app = FastAPI()
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8001))  # Default to 8000 if not set
     uvicorn.run(app, host="127.0.0.1", port=port)
