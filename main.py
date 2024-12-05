@@ -8,7 +8,7 @@ from typing import List
 import logging
 import numpy as np
 
-encoder = joblib.load(r"C:\Users\raksh\01\adverse_events.csv")  # Encoder for categorical data
+encoder = joblib.load("adverse_events.csv")  # Encoder for categorical data
 model = joblib.load('model.joblib')  # Pre-trained machine learning model
 
 # Initialize FastAPI
